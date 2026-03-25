@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تاجر | متجر رقمي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep:    #06060c;
+      --bg-card:    #0e0e1a;
+      --bg-glass:   rgba(255,255,255,0.03);
+      --border:     rgba(255,255,255,0.07);
+      --accent:     #f59e0b;
+      --accent2:    #ef4444;
+      --accent3:    #8b5cf6;
+      --neon:       #f59e0b;
+      --text:       #f0f0f0;
+      --text-muted: #6b7280;
+      --text-soft:  #9ca3af;
+      --glow:       0 0 30px rgba(245,158,11,0.15);
+      --glow-strong:0 0 60px rgba(245,158,11,0.25);
+      --radius:     12px;
+      --radius-lg:  20px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.4;
+    }
+    /* ─── NAVBAR ─── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,6,12,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(16px, 4vw, 48px);
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px; font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(245,158,11,0.5);
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+    .nav-logo span { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-soft); border-radius: 8px;
+      padding: 8px 16px; cursor: pointer; font-family: 'Tajawal', sans-serif;
+      font-size: 14px; transition: all .2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .cart-btn {
+      background: var(--accent); border-color: var(--accent);
+      color: #000; font-weight: 700; position: relative;
+    }
+    .cart-btn:hover { background: #d97706; border-color: #d97706; color: #000; }
+    #cart-count {
+      position: absolute; top: -8px; right: -8px;
+      background: var(--accent2); color: #fff;
+      border-radius: 50%; width: 20px; height: 20px;
+      font-size: 11px; font-weight: 700;
+      display: none; align-items: center; justify-content: center;
+    }
+    /* ─── HERO ─── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: clamp(60px, 10vw, 120px) clamp(16px, 4vw, 48px) clamp(40px, 6vw, 80px);
+      text-align: center;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 40% at 20% 80%, rgba(139,92,246,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse 40% 40% at 80% 80%, rgba(239,68,68,0.06) 0%, transparent 60%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(245,158,11,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,158,11,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
+      color: var(--accent); border-radius: 100px; padding: 6px 16px;
+      font-size: 13px; font-weight: 500; margin-bottom: 24px;
+      animation: pulse-badge 3s ease-in-out infinite;
+    }
+    @keyframes pulse-badge {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.2); }
+      50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
+    }
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(36px, 7vw, 80px);
+      font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, #fff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-soft); max-width: 500px; margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: clamp(24px, 5vw, 60px);
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700; color: var(--accent);
+      text-shadow: 0 0 20px rgba(245,158,11,0.4);
+    }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    /* ─── MAIN CONTENT ─── */
+    .container {
+      max-width: 1400px; margin: 0 auto;
+      padding: 0 clamp(16px, 4vw, 48px);
+    }
+    /* ─── FILTERS ─── */
+    .filters-bar {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      align-items: center; margin: 40px 0 28px;
+    }
+    .search-wrap {
+      position: relative; flex: 1; min-width: 220px;
+    }
+    .search-wrap svg {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); pointer-events: none;
+    }
+    #search-input {
+      width: 100%; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 44px 12px 16px; color: var(--text);
+      font-family: 'Tajawal', sans-serif; font-size: 15px;
+      outline: none; transition: border-color .2s;
+    }
+    #search-input:focus { border-color: var(--accent); }
+    #search-input::placeholder { color: var(--text-muted); }
+    .filter-select {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 16px;
+      color: var(--text); font-family: 'Tajawal', sans-serif;
+      font-size: 14px; outline: none; cursor: pointer;
+      transition: border-color .2s; min-width: 140px;
+    }
+    .filter-select:focus { border-color: var(--accent); }
+    .filter-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .filter-tab {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: 100px;
+      padding: 8px 18px; cursor: pointer; font-family: 'Tajawal', sans-serif;
+      font-size: 13px; font-weight: 500; transition: all .2s;
+    }
+    .filter-tab.active, .filter-tab:hover {
+      background: var(--accent); border-color: var(--accent);
+      color: #000; font-weight: 700;
+    }
+    /* ─── SECTION HEADER ─── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px;
+    }
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::before {
+      content: ''; display: block;
+      width: 4px; height: 22px;
+      background: var(--accent); border-radius: 2px;
+    }
+    .products-count {
+      font-size: 13px; color: var(--text-muted);
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 4px 12px; border-radius: 100px;
+    }
+    /* ─── PRODUCTS GRID ─── */
+    #products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px; padding-bottom: 80px;
+    }
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden; position: relative;
+      transition: transform .3s, border-color .3s, box-shadow .3s;
+      cursor: pointer;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(245,158,11,0.4);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(245,158,11,0.08);
+    }
+    .badge {
+      position: absolute; top: 12px; right: 12px; z-index: 2;
+      font-size: 11px; font-weight: 700; padding: 4px 10px;
+      border-radius: 100px; letter-spacing: 0.5px;
+    }
+    .badge-new { background: var(--accent3); color: #fff; }
+    .badge-hot { background: var(--accent2); color: #fff; }
+    .badge-sale { background: var(--accent); color: #000; }
+    .badge-featured { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
+    .discount-tag {
+      position: absolute; top: 12px; left: 12px; z-index: 2;
+      background: var(--accent2); color: #fff;
+      font-size: 12px; font-weight: 700; padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .product-icon {
+      width: 100%; aspect-ratio: 16/10;
+      background: linear-gradient(135deg, #0e0e1a 0%, #1a1a2e 100%);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .product-icon::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, var(--bg-card) 100%);
+    }
+    .product-icon img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .4s;
+    }
+    .product-card:hover .product-icon img { transform: scale(1.05); }
+    .icon-placeholder { font-size: 48px; opacity: 0.3; }
+    .product-info { padding: 16px; }
+    .product-game {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--accent);
+      display: block; margin-bottom: 6px;
+    }
+    .product-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--text); line-height: 1.4; margin-bottom: 10px;
+    }
+    .product-meta {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .region-tag, .category-tag {
+      font-size: 11px; padding: 3px 8px; border-radius: 6px;
+      font-weight: 500;
+    }
+    .region-tag { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+    .category-tag { background: rgba(245,158,11,0.1); color: var(--accent); border: 1px solid rgba(245,158,11,0.2); }
+    .product-pricing {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .price {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px; font-weight: 700; color: var(--accent);
+    }
+    .old-price {
+      font-size: 13px; color: var(--text-muted);
+      text-decoration: line-through;
+    }
+    .btn-add-cart {
+      width: 100%; background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: var(--accent); border-radius: 10px;
+      padding: 10px; cursor: pointer; font-family: 'Tajawal', sans-serif;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all .2s;
+    }
+    .btn-add-cart:hover {
+      background: var(--accent); border-color: var(--accent);
+      color: #000;
+    }
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      grid-column: 1 / -1; text-align: center;
+      padding: 80px 20px;
+    }
+    .empty-state .icon { font-size: 64px; margin-bottom: 16px; opacity: 0.4; }
+    .empty-state h3 {
+      font-size: 20px; color: var(--text-muted); margin-bottom: 8px;
+    }
+    /* ─── LOADING ─── */
+    .skeleton {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .skeleton-img {
+      width: 100%; aspect-ratio: 16/10;
+      background: linear-gradient(90deg, #111 25%, #1a1a2e 50%, #111 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .skeleton-body { padding: 16px; }
+    .skeleton-line {
+      height: 12px; border-radius: 6px; margin-bottom: 10px;
+      background: linear-gradient(90deg, #111 25%, #1a1a2e 50%, #111 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .skeleton-line.short { width: 60%; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    /* ─── CART PANEL ─── */
+    #cart-overlay {
+      position: fixed; inset: 0; z-index: 199;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    #cart-overlay.show { opacity: 1; pointer-events: all; }
+    #cart-panel {
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 200;
+      width: min(400px, 100vw);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    #cart-panel.open { transform: translateX(0); }
+    .cart-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cart-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px; color: var(--text);
+    }
+    .cart-close {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 20px; cursor: pointer; padding: 4px;
+      transition: color .2s;
+    }
+    .cart-close:hover { color: var(--text); }
+    #cart-items { flex: 1; overflow-y: auto; padding: 16px; }
+    .cart-empty { text-align: center; padding: 60px 20px; }
+    .cart-empty span { font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px; }
+    .cart-empty p { color: var(--text-muted); }
+    .cart-item {
+      background: var(--bg-glass);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; margin-bottom: 10px;
+    }
+    .cart-item-info {
+      display: flex; justify-content: space-between; margin-bottom: 10px;
+    }
+    .cart-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .cart-item-price { font-size: 14px; color: var(--accent); font-weight: 700; }
+    .cart-item-controls {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cart-item-controls button {
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text); width: 28px; height: 28px;
+      border-radius: 6px; cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .cart-item-controls button:hover { border-color: var(--accent); color: var(--accent); }
+    .cart-item-controls .remove-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .cart-item-controls span { font-size: 15px; font-weight: 700; min-width: 20px; text-align: center; }
+    .cart-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .cart-total-row {
+      display: flex; justify-content: space-between;
+      margin-bottom: 14px; font-size: 16px;
+    }
+    .cart-total-label { color: var(--text-soft); }
+    #cart-total {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--accent);
+    }
+    .btn-order {
+      width: 100%; background: var(--accent); color: #000;
+      border: none; border-radius: 12px; padding: 14px;
+      font-family: 'Tajawal', sans-serif; font-size: 16px; font-weight: 800;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-order:hover { background: #d97706; transform: translateY(-1px); }
+    /* ─── NOTIFICATION ─── */
+    .cart-notif {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--bg-card); border: 1px solid rgba(245,158,11,0.4);
+      color: var(--text); padding: 12px 24px; border-radius: 100px;
+      font-size: 14px; font-weight: 600; z-index: 9999;
+      opacity: 0; transition: all .35s cubic-bezier(.4,0,.2,1);
+      white-space: nowrap; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    .cart-notif span { color: var(--accent); margin-left: 6px; }
+    .cart-notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .cart-notif.success { border-color: rgba(16,185,129,0.4); }
+    .cart-notif.success span { color: #10b981; }
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 30px clamp(16px, 4vw, 48px);
+      text-align: center;
+      color: var(--text-muted); font-size: 13px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      .hero-stats { gap: 24px; }
+      .filters-bar { flex-direction: column; align-items: stretch; }
+      .filter-tabs { justify-content: center; }
+      #products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="/" class="nav-logo">TAJER<span>.</span></a>
+  <div class="nav-actions">
+    <a href="/login.html" class="nav-btn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      دخول
+    </a>
+    <button class="nav-btn cart-btn" onclick="toggleCart()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      سلتي
+      <span id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+      متجر رقمي متكامل
+    </div>
+    <h1>TAJER</h1>
+    <p>اشتري كل شيء رقمي — شحن العاب، بطاقات هدايا، اشتراكات، وأكثر بأفضل الأسعار</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num" id="stat-products">—</div>
+        <div class="stat-label">منتج متاح</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">خدمة متواصلة</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">آمن وموثوق</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="container">
+  <div class="filters-bar">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="ابحث عن منتج..." oninput="handleSearch()">
+    </div>
+    <select class="filter-select" id="category-filter" onchange="handleFilter()">
+      <option value="all">جميع الفئات</option>
+      <option value="gift_card">بطاقات هدايا</option>
+      <option value="topup">شحن رصيد</option>
+      <option value="subscription">اشتراكات</option>
+      <option value="game_key">مفاتيح ألعاب</option>
+      <option value="other">أخرى</option>
+    </select>
+  </div>
+
+  <div class="filters-bar" style="margin-top:0">
+    <div class="filter-tabs" id="game-tabs">
+      <button class="filter-tab active" data-game="all" onclick="selectGame(this, 'all')">الكل</button>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">المنتجات</h2>
+    <span class="products-count" id="products-count">—</span>
+  </div>
+
+  <div id="products-grid">
+    <!-- Skeleton loading -->
+    ${[...Array(8)].map(() => `
+    <div class="skeleton">
+      <div class="skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>`).join('')}
+  </div>
+</main>
+
+<!-- CART OVERLAY -->
+<div id="cart-overlay" onclick="toggleCart()"></div>
+
+<!-- CART PANEL -->
+<div id="cart-panel">
+  <div class="cart-header">
+    <h2>🛒 سلة الشراء</h2>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div id="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label">المجموع الكلي</span>
+      <span id="cart-total">0 د.ع</span>
+    </div>
+    <button class="btn-order" onclick="placeOrder()">إرسال الطلب ←</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <strong>تاجر</strong> — جميع الحقوق محفوظة · <a href="/admin/">لوحة التحكم</a></p>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/js/supabase.js"></script>
+<script src="/js/products.js"></script>
+<script>
+  let activeGame = 'all';
+  let searchTimeout;
+
+  async function loadProducts() {
+    const search = document.getElementById('search-input').value;
+    const category = document.getElementById('category-filter').value;
+    const products = await fetchProducts({ category, game: activeGame, search });
+
+    const grid = document.getElementById('products-grid');
+    const countEl = document.getElementById('products-count');
+    const statEl = document.getElementById('stat-products');
+
+    if (!products.length) {
+      grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>لا توجد منتجات مطابقة</h3></div>`;
+      countEl.textContent = '0 منتج';
+      return;
+    }
+
+    grid.innerHTML = products.map(renderProductCard).join('');
+    countEl.textContent = `${products.length} منتج`;
+
+    // Update stat on first load
+    if (statEl.textContent === '—') {
+      animateNumber(statEl, 0, products.length, 1200);
+    }
+  }
+
+  function animateNumber(el, from, to, duration) {
+    const start = performance.now();
+    requestAnimationFrame(function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      el.textContent = Math.round(from + (to - from) * easeOut(p));
+      if (p < 1) requestAnimationFrame(step);
+    });
+  }
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+  async function loadGameTabs() {
+    const { data } = await sb.from('products').select('game').not('game', 'is', null);
+    if (!data) return;
+    const games = [...new Set(data.map(p => p.game).filter(Boolean))];
+    const tabs = document.getElementById('game-tabs');
+    games.forEach(game => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-tab';
+      btn.dataset.game = game;
+      btn.textContent = game;
+      btn.onclick = () => selectGame(btn, game);
+      tabs.appendChild(btn);
+    });
+  }
+
+  function selectGame(btn, game) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    activeGame = game;
+    loadProducts();
+  }
+
+  function handleFilter() { loadProducts(); }
+
+  function handleSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(loadProducts, 350);
+  }
+
+  // Init
+  updateCartUI();
+  loadGameTabs();
+  loadProducts();
+</script>
+</body>
+</html>
